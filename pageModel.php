@@ -1,12 +1,73 @@
 <?php
 
-class Category
+class Page extends model
 {
-	
+    public static function getSettings()
+	{
+       $dataBase = Db::getConnection();
+       $settings = array();
+       $result = $dataBase->query("SELECT title,meta_data,meta_key,text,tag FROM settings WHERE page='index'");
+       $settings = $result->fetch();
+       return $settings;
+    }
+
+    public static function getAdminSettings()
+    {
+        $dataBase = Db::getConnection();
+        $settings = array();
+        $result = $dataBase->query("SELECT title,meta_data,meta_key,text,tag FROM settings WHERE page='index'");
+        $i = 0;
+        while($row = $result->fetch()) {
+            $settings[$i]['tag'] = $row['tag'];
+            $settings[$i]['title'] = $row['title'];
+            $settings[$i]['meta_data'] = $row['meta_data'];
+            $settings[$i]['meta_key'] = $row['meta_key'];
+            $settings[$i]['text'] = $row['text'];
+            $i++;
+        } 
+    return $settings;
+    }
+
+    public static function getPageBytag($tag)
+    {
+        // 数据库连接
+        $dataBase = Db::getConnection();
+        // 发送请求
+        $sql = 'SELECT * FROM settings WHERE tag = :tag';
+        // 请求就绪
+        $result = $dataBase->prepare($sql);
+        $result->bindParam(':tag', $tag, PDO::PARAM_INT);
+        // 以指定形式接受数据
+        $result->setFetchMode(PDO::FETCH_ASSOC);
+        // 执行
+        $result->execute();
+        // 接受并返回结果
+        return $result->fetch();
+    }
+
+    public static function updatePage($tag, $options)
+    {
+        $db = Db::getConnection();
+        $sql = "UPDATE settings
+        SET 
+        title = :title, 
+        meta_data = :meta_data, 
+        meta_key = :meta_key,
+        text = :text
+        WHERE tag = :tag";
+        $result = $db->prepare($sql);
+        $result->bindParam(':id', $id, PDO::PARAM_INT);
+        $result->bindParam(':title', $options['title'], PDO::PARAM_STR);
+        $result->bindParam(':meta_data', $options['meta_data'], PDO::PARAM_STR);
+        $result->bindParam(':meta_key', $options['meta_key'], PDO::PARAM_STR);
+        $result->bindParam(':text', $options['text'], PDO::PARAM_STR);
+        return $result->execute();
+    }
+
 	public static function getCategoriesList()
 	{
 	$dataBase = Db::getConnection();
-    	$categoryList = [];
+    $categoryList = [];
 	$result = $dataBase->query('SELECT * FROM categories');
 	$i = 0;
 	while($row = $result->fetch()) {
@@ -16,13 +77,14 @@ class Category
 		$i++;
     }
 	return $categoryList;
-	}
+    }
+    
     public static function getCategoryItemByTag($category_tag)
     {
     //请求数据库
     $category_tag = intval($category_tag);
 	    if($category_tag){
-            // 数据库连接
+        // 数据库连接
             $dataBase = Db::getConnection();
             // 向数据库发送请求
             $sql = 'SELECT * FROM categories WHERE tag = :tag';
@@ -107,71 +169,6 @@ class Category
         // 请求就绪后发送      接受并返回结果
         $result = $dataBase->prepare($sql);
         $result->bindParam(':tag', $tag, PDO::PARAM_INT);
-        return $result->execute();
-    }
-}
-
-
-class Page
-{	
-    public static function getSettings()
-    {
-        $dataBase = Db::getConnection();
-        $settings = array();
-        $result = $dataBase->query("SELECT title,meta_data,meta_key,text,tag FROM settings WHERE page='index'");
-        $settings = $result->fetch();
-        return $settings;
-    }
-
-    public static function getAdminSettings()
-    {
-        $dataBase = Db::getConnection();
-        $settings = array();
-        $result = $dataBase->query("SELECT title,meta_data,meta_key,text,tag FROM settings WHERE page='index'");
-        $i = 0;
-        while($row = $result->fetch()) {
-            $settings[$i]['tag'] = $row['tag'];
-            $settings[$i]['title'] = $row['title'];
-            $settings[$i]['meta_data'] = $row['meta_data'];
-            $settings[$i]['meta_key'] = $row['meta_key'];
-            $settings[$i]['text'] = $row['text'];
-            $i++;
-        } 
-    return $settings;
-    }
-    public static function getPageBytag($tag)
-    {
-        // 数据库连接
-        $dataBase = Db::getConnection();
-        // 发送请求
-        $sql = 'SELECT * FROM settings WHERE tag = :tag';
-        // 请求就绪
-        $result = $dataBase->prepare($sql);
-        $result->bindParam(':tag', $tag, PDO::PARAM_INT);
-        // 以指定形式接受数据
-        $result->setFetchMode(PDO::FETCH_ASSOC);
-        // 执行
-        $result->execute();
-        // 接受并返回结果
-        return $result->fetch();
-    }
-
-    public static function updatePage($tag, $options)
-    {
-        $db = Db::getConnection();
-        $sql = "UPDATE settings
-        SET 
-        title = :title, 
-        meta_data = :meta_data, 
-        meta_key = :meta_key,
-        text = :text
-        WHERE tag = :tag";
-        $result = $db->prepare($sql);
-        $result->bindParam(':id', $id, PDO::PARAM_INT);
-        $result->bindParam(':title', $options['title'], PDO::PARAM_STR);
-        $result->bindParam(':meta_data', $options['meta_data'], PDO::PARAM_STR);
-        $result->bindParam(':meta_key', $options['meta_key'], PDO::PARAM_STR);
-        $result->bindParam(':text', $options['text'], PDO::PARAM_STR);
         return $result->execute();
     }
 }
