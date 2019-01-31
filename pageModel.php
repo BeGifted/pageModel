@@ -6,7 +6,7 @@ class Category
 	public static function getCategoriesList()
 	{
 	$dataBase = Db::getConnection();
-    $categoryList = [];
+    	$categoryList = [];
 	$result = $dataBase->query('SELECT * FROM categories');
 	$i = 0;
 	while($row = $result->fetch()) {
@@ -22,7 +22,7 @@ class Category
     //请求数据库
     $category_tag = intval($category_tag);
 	    if($category_tag){
-        // 数据库连接
+            // 数据库连接
             $dataBase = Db::getConnection();
             // 向数据库发送请求
             $sql = 'SELECT * FROM categories WHERE tag = :tag';
@@ -113,15 +113,14 @@ class Category
 
 
 class Page
-{
-	
-	public static function getSettings()
-	{
-       $dataBase = Db::getConnection();
-       $settings = array();
-       $result = $dataBase->query("SELECT title,meta_data,meta_key,text,tag FROM settings WHERE page='index'");
-       $settings = $result->fetch();
-       return $settings;
+{	
+    public static function getSettings()
+    {
+        $dataBase = Db::getConnection();
+        $settings = array();
+        $result = $dataBase->query("SELECT title,meta_data,meta_key,text,tag FROM settings WHERE page='index'");
+        $settings = $result->fetch();
+        return $settings;
     }
 
     public static function getAdminSettings()
